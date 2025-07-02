@@ -11,7 +11,6 @@ Route::view('/login', 'auth.login');
 Route::view('/register', 'auth.register');
 
 Route::get('students/create', [StudentController::class, 'create']);
-Route::get('students/create', [StudentController::class, 'create']);
 Route::get('/students/{student}', [StudentController::class, 'show'])->name('show');
 Route::get('/students', [StudentController::class, 'index'])->name('index');
 Route::get('/students/edit', [StudentController::class, 'layoutedit'])->name('layoutedit');

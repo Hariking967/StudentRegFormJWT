@@ -19,7 +19,7 @@
         <header>
             <div class="fixed top-0 left-0 right-0 flex flex-row justify-between bg-white text-black pt-3 pb-3">
                 <div>
-                    <a href='/students' class='text-2xl text-black hover:bg-gray-600 px-5 py-3 rounded transition duration-200 cursor-pointer'>
+                    <a href='/students/create' class='text-2xl text-black hover:bg-gray-600 px-5 py-3 rounded transition duration-200 cursor-pointer'>
                         Dashboard
                     </a>
                     <a href='/students/edit' class='text-2xl text-black hover:bg-gray-600 px-5 py-3 rounded transition duration-200 cursor-pointer'>
