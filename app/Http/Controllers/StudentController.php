@@ -6,138 +6,58 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
-    public function create()
+    public function getMyStudent()
     {
-        $student = Student::where(
-            'officialemail',
-            Auth::guard('api')->user()->email
-        )->first();
-        if ($student) {
-            return redirect("/students/{$student->rollno}")->with('success', 'Student exists!');
+        $user = Auth::guard('api')->user();
+        $student = Student::where('officialemail', $user->email)->first();
+
+        if (!$student) {
+            return response()->json(['status' => 'not_found'], 404);
         }
-        if (session('success')) {
-            return view('student.create')->with('success', 'Logged in successfully');
-        }
-        return view('student.create');
+
+        return response()->json(['status' => 'found', 'student' => $student]);
     }
-    public function store()
+
+    public function store(Request $request)
     {
-        $user = Auth::guard('api')->user(); // Use API guard
-        $data = request()->validate([
+        $user = Auth::guard('api')->user();
+        $data = $request->validate([
             'rollno' => ['required', 'unique:students,rollno'],
-            'name' => ['required'],
-            'dob' => ['required', 'date'],
-            'email' => ['required', 'email'],
-            'contact' => ['required', 'numeric', 'digits:10'],
-            'dept' => ['required'],
-            'passout' => ['required', 'numeric', 'digits:4']
+            'name'   => ['required'],
+            'dob'    => ['required', 'date'],
+            'email'  => ['required', 'email'],
+            'contact' => ['required', 'digits:10'],
+            'dept'   => ['required'],
+            'passout' => ['required', 'digits:4'],
         ]);
-
         $data['officialemail'] = $user->email;
-
-        try {
-            $student = Student::create($data);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Student added successfully!',
-                'student' => $student
-            ]);
-        } catch (QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Contact number or email already exists.'
-                ], 422);
-            }
-
-            Log::error($e);
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Something went wrong. Please try again.'
-            ], 500);
-        }
+        Student::create($data);
+        return response()->json(['status' => 'success', 'student' => $data]);
     }
 
-    public function index()
+    public function update(Request $request, $rollno)
     {
-        if (Auth::user()->email != 'admin@gmail.com') {
-            $student = Student::where('officialemail', Auth::user()->email)->first();
-            if (!$student) {
-                return redirect('/students/create');
-            }
-            return redirect("/students/{$student->rollno}");
-        }
-        $students = Student::latest()->get();
-        $n = Student::count();
-        return view('student.index', ['students' => $students, 'n' => $n]);
-    }
-    public function show(Student $student)
-    {
-        $n = Student::count();
-        return view('student.show', ['student' => $student, 'n' => $n]);
-    }
-    public function edit(Student $student)
-    {
-        return view('student.edit', ['student' => $student]);
-    }
-    public function layoutedit()
-    {
-        $student = Student::where('officialemail', Auth::user()->email)->first();
-        return view('student.edit', ['student' => $student]);
-    }
-    public function update(Student $student)
-    {
-        $user = Auth::guard('api')->user(); // Use API guard
-        $predata = Student::where('officialemail', $student->officialemail)->first();
-        $data = request()->validate([
-            'rollno' => ['required', Rule::unique('students', 'rollno')->ignore($student->id)],
-            'name' => ['required'],
-            'dob' => ['required', 'date'],
-            'email' => ['required', 'email', Rule::unique('students', 'email')->ignore($student->id)],
-            'contact' => ['required', Rule::unique('students', 'contact')->ignore($student->id), 'numeric', 'digits:10'],
-            'dept' => ['required'],
-            'passout' => ['required', 'numeric', 'digits:4']
+        $student = Student::where('rollno', $rollno)->firstOrFail();
+        $data = $request->validate([
+            'rollno' => ['required', Rule::unique('students')->ignore($student->id)],
+            'name'   => ['required'],
+            'dob'    => ['required', 'date'],
+            'email'  => ['required', 'email'],
+            'contact' => ['required', 'digits:10'],
+            'dept'   => ['required'],
+            'passout' => ['required', 'digits:4'],
         ]);
-
-        $data['officialemail'] = $predata->officialemail;
-
-        try {
-            $student->update($data);
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Student updated successfully!',
-                'student' => $student
-            ]);
-        } catch (QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Contact number or email already exists.'
-                ], 422);
-            }
-
-            Log::error($e);
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An unexpected error occurred while updating.'
-            ], 500);
-        }
+        $student->update($data);
+        return response()->json(['status' => 'updated', 'student' => $data]);
     }
 
-
-    public function destroy(Student $student)
+    public function destroy($rollno)
     {
-        $user = Auth::guard('api')->user(); // Use API guard
+        $student = Student::where('rollno', $rollno)->firstOrFail();
         $student->delete();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Student deleted successfully!'
-        ]);
+        return response()->json(['status' => 'deleted']);
     }
 }

@@ -1,18 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StudentController;
+use Illuminate\Support\Facades\Http;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::view('/login', 'auth.login');
-Route::view('/register', 'auth.register');
-
-Route::get('students/create', [StudentController::class, 'create']);
-Route::get('/students/{student}', [StudentController::class, 'show'])->name('show');
-Route::get('/students', [StudentController::class, 'index'])->name('index');
-Route::get('/students/edit', [StudentController::class, 'layoutedit'])->name('layoutedit');
-Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('edit');
-Route::get('/students/edit', [StudentController::class, 'layoutedit'])->name('layoutedit');
+Route::view('/login', 'auth.login')->name('login');
+Route::view('/register', 'auth.register')->name('register');
+Route::view('/students/create', 'student.create')->name('student.create');
+Route::view('/students/edit', 'student.edit')->name('student.edit');
+Route::view('/students/show', 'student.show')->name('student.show');
