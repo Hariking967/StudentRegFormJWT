@@ -13,12 +13,12 @@ class StudentController extends Controller
     {
         $user = Auth::guard('api')->user();
         $student = Student::where('officialemail', $user->email)->first();
-
+        $n = Student::count();
         if (!$student) {
             return response()->json(['status' => 'not_found'], 404);
         }
 
-        return response()->json(['status' => 'found', 'student' => $student]);
+        return response()->json(['status' => 'found', 'student' => $student, 'n' => $n]);
     }
 
     public function store(Request $request)

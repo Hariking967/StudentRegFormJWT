@@ -10,6 +10,7 @@ if (!localStorage.getItem('token')) {
 <div class="flex min-h-screen items-center justify-center bg-gray-800">
   <div class="bg-white text-blue-600 rounded-lg shadow p-6 w-full max-w-2xl">
     <h1 class="text-4xl text-center mb-4">Student Info</h1>
+    <h2 class="text-2xl text-center mb-4">Total Students Registered: <span id="nstudents" class="space-y-4 text-lg"></span></h2>
     <div id="studentData" class="space-y-4 text-lg"></div>
     <div class="mt-8 flex justify-end gap-4">
       <button id="editBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded">Edit</button>
@@ -27,7 +28,7 @@ async function loadStudent() {
     }
   });
   if (res.ok) {
-    const { student } = await res.json();
+    const { student,n } = await res.json();
     const container = document.getElementById('studentData');
     const keys = ['rollno','name','dob','email','contact','dept','passout'];
     keys.forEach(key => {
@@ -35,6 +36,8 @@ async function loadStudent() {
       el.innerHTML = `<strong>${key.toUpperCase()}:</strong> ${student[key]}`;
       container.appendChild(el);
     });
+    const nstudentsContainer = document.getElementById('nstudents');
+    nstudentsContainer.innerHTML = n;
     document.getElementById('editBtn').onclick = () => window.location.href = '/students/edit?rollno='+student.rollno;
     document.getElementById('deleteBtn').onclick = async () => {
       if (confirm('Delete?')) {
