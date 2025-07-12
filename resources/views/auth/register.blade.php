@@ -60,7 +60,6 @@
                     if (res.ok) {
                         localStorage.setItem('token', data.authorisation.token);
 
-                        // Check if student info exists
                         const infoRes = await fetch("/api/student", {
                             headers: {
                                 "Accept": "application/json",

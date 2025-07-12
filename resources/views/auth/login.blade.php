@@ -24,7 +24,6 @@
             </button>
         </form>
 
-        <!-- ✅ CORRECT PLACEMENT OF SCRIPT -->
         <script>
             document.getElementById('loginForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
