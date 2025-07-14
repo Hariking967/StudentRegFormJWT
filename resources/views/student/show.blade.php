@@ -18,38 +18,52 @@ if (!localStorage.getItem('token')) {
     </div>
   </div>
 </div>
+
 <script>
-async function loadStudent() {
-  const token = localStorage.getItem('token');
-  const res = await fetch('/api/student', {
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Accept": "application/json"
-    }
-  });
-  if (res.ok) {
-    const { student,n } = await res.json();
-    const container = document.getElementById('studentData');
-    const keys = ['rollno','name','dob','email','contact','dept','passout'];
-    keys.forEach(key => {
-      const el = document.createElement('div');
-      el.innerHTML = `<strong>${key.toUpperCase()}:</strong> ${student[key]}`;
-      container.appendChild(el);
-    });
-    const nstudentsContainer = document.getElementById('nstudents');
-    nstudentsContainer.innerHTML = n;
-    document.getElementById('editBtn').onclick = () => window.location.href = '/students/edit?rollno='+student.rollno;
-    document.getElementById('deleteBtn').onclick = async () => {
-      if (confirm('Delete?')) {
-        const dres = await fetch(`/api/students/${student.rollno}`, {
-          method: 'DELETE',
-          headers: {"Authorization": "Bearer " + token, "Accept": "application/json"}
-        });
-        if (dres.ok) window.location.href = '/students/create';
-      }
-    };
+document.addEventListener("DOMContentLoaded", function () {
+  if (!localStorage.getItem('token')) {
+    alert('Please login first!');
+    window.location.href = '/login';
+    return;
   }
-}
-loadStudent();
+
+  async function loadStudent() {
+    try {
+      const res = await apiFetch('/student');
+      if (!res.ok) throw new Error("Failed to fetch");
+
+      const { student, n } = await res.json();
+      const container = document.getElementById('studentData');
+      const keys = ['rollno','name','dob','email','contact','dept','passout'];
+      keys.forEach(key => {
+        const el = document.createElement('div');
+        el.innerHTML = `<strong>${key.toUpperCase()}:</strong> ${student[key]}`;
+        container.appendChild(el);
+      });
+
+      document.getElementById('nstudents').textContent = n;
+
+      document.getElementById('editBtn').onclick = () => {
+        window.location.href = '/students/edit?rollno=' + student.rollno;
+      };
+
+      document.getElementById('deleteBtn').onclick = async () => {
+        if (confirm('Delete?')) {
+          const dres = await apiFetch(`/students/${student.rollno}`, {
+            method: 'DELETE'
+          });
+          if (dres.ok) window.location.href = '/students/create';
+          else alert("Failed to delete student");
+        }
+      };
+    } catch (err) {
+      console.error("Error while loading student:", err);
+      alert("An error occurred while fetching student data.");
+    }
+  }
+
+  loadStudent();
+});
 </script>
+
 @endsection

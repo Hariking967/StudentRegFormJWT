@@ -13,13 +13,12 @@
 </head>
 <body class="bg-gray-800 text-white">
     <header class="fixed top-0 left-0 right-0 bg-white flex justify-between p-3">
-        <div>
-            <a href='/students/show' class='px-5 py-3 hover:bg-gray-600 rounded text-black'>Dashboard</a>
-            <a href='/students/edit' class='px-5 py-3 hover:bg-gray-600 rounded text-black'>Form</a>
+        <div class="pt-2">
+            <a href='/students/show' class='items-center text-2xl text-black px-5 py-3 hover:bg-gray-400'>Dashboard</a>
+            <a href='/students/edit' class='items-center text-2xl text-black px-5 py-3 hover:bg-gray-400'>Form</a>
         </div>
         <div>
-            <div id="auth-buttons" class="flex items-center justify-end space-x-2 pr-6">
-</div>
+            <div id="auth-buttons" class="flex items-center justify-end space-x-2 pr-6"></div>
 
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
@@ -33,12 +32,7 @@
             `;
         } else {
             try {
-                const res = await fetch('/api/user', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                    }
-                });
+                const res = await apiFetch('/user');
 
                 if (!res.ok) throw new Error("User fetch failed");
 
@@ -62,7 +56,6 @@
         window.location.href = '/';
     }
 </script>
-
         </div>
     </header>
     <div class="pt-32">

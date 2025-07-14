@@ -33,6 +33,7 @@
             </form>
 
             <script>
+                // import { apiFetch } from '/js/api.js';
                 document.getElementById('registerForm').addEventListener('submit', async function(e) {
                     e.preventDefault();
 
@@ -46,13 +47,17 @@
                         return;
                     }
 
-                    const res = await fetch("/api/register", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({ name, email, password })
+                    // const res = await fetch("/api/register", {
+                    //     method: "POST",
+                    //     headers: {
+                    //         "Content-Type": "application/json",
+                    //         "Accept": "application/json"
+                    //     },
+                    //     body: JSON.stringify({ name, email, password })
+                    // });
+                    const res = await apiFetch('/register', {
+                    method: "POST",
+                    body: JSON.stringify({ name, email, password })
                     });
 
                     const data = await res.json();
@@ -60,12 +65,13 @@
                     if (res.ok) {
                         localStorage.setItem('token', data.authorisation.token);
 
-                        const infoRes = await fetch("/api/student", {
-                            headers: {
-                                "Accept": "application/json",
-                                "Authorization": `Bearer ${data.authorisation.token}`
-                            }
-                        });
+                        // const infoRes = await fetch("/api/student", {
+                        //     headers: {
+                        //         "Accept": "application/json",
+                        //         "Authorization": `Bearer ${data.authorisation.token}`
+                        //     }
+                        // });
+                        const infoRes = await apiFetch('/student');
 
                         if (infoRes.status === 404) {
                             alert("No student info found. Redirecting to create...");

@@ -22,16 +22,12 @@ if (!localStorage.getItem('token')) {
   </form>
 </div>
 <script>
+// import { apiFetch } from '/js/api.js';
 document.getElementById('createForm').addEventListener('submit', async e => {
   e.preventDefault();
   const token = localStorage.getItem('token');
-  const res = await fetch("/api/students", {
+  const res = await apiFetch("/students", {
     method: "POST",
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
     body: JSON.stringify({
       rollno: document.getElementById('rollno').value,
       name: document.getElementById('name').value,
@@ -42,10 +38,15 @@ document.getElementById('createForm').addEventListener('submit', async e => {
       passout: document.getElementById('passout').value
     })
   });
-  if (res.ok) {
-    const data = await res.json();
-    window.location.href = `/students/show`;
-  } else alert("Could not create student");
+  const data = await res.json();
+
+if (res.ok) {
+  window.location.href = `/students/show`;
+} else {
+  console.error("Student creation failed:", data);
+  alert(data.message || JSON.stringify(data.errors) || "Could not create student");
+}
+
 });
 </script>
 @endsection
